@@ -35,6 +35,6 @@ for i in ./*.sh
 do
 	echo "files found that needs edititng $i"
 	echo "$old $new"
-	sed -e "s/${old}/${new}/g" $i > $i.new
+	sed -e "s/${old}/${new}/g" "$i" > "$i".new
 done
 

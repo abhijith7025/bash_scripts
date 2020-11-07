@@ -3,6 +3,10 @@
 #the script will add or remove a new user
 
 echo "Welcome to user add script"
+if [[ "$USER" != "root" ]]; then
+	echo "This script has to be ran as root exiting"
+	exit
+fi
 
 if [[ "$#" == 0 ]]; then
 	echo "No argument has been provided"
@@ -28,6 +32,7 @@ if [[ "$1" == "-a" ]]; then
 			echo "Adding user"
 			useradd -m "$2" -s "$4"
 			echo "$2":"$3" | chpasswd
+			echo "The user has been added"
 		elif [[ "$choice" == "n" ]]; then
 			echo "Abort"
 			exit
@@ -51,7 +56,7 @@ elif [[ "$1" == "-d" ]]; then
 				exit
 			else 
 				echo "deleting user"
-				userdel "$2"
+				userdel -f "$2"
 				echo "user deleted"
 			fi
 		
@@ -60,12 +65,12 @@ elif [[ "$1" == "-d" ]]; then
 	fi
 	
 elif [[ "$2" == "-h" ]] || [[ $# == 1 ]]; then
-	echo "The help text"
-	echo "-a - add a new user"
-	echo "syntax\n\
+	printf "The help text"
+	printf "-a - add a new user"
+	printf "syntax\n\
 	$0 -a <user> <password> <shell>"
-	echo "-d - remove a user"
-	echo "syntax\n\
+	printf "-d - remove a user"
+	printf "syntax\n\
 	$0 -d <user>"
 	echo "-h - print the help text"
 else
