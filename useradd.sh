@@ -1,82 +1,73 @@
 #!/bin/bash
 
-#the script will add or remove a new user
+## checking if the user is privileged or not
 
-echo "Welcome to user add script"
-if [[ "$USER" != "root" ]]; then
-	echo "This script has to be ran as root exiting"
-	exit
+if [[ $EUID != 0 ]]
+then
+	echo "Script has to be ran as root or sudo"
+	echo "Aborting"
+	exit 101
 fi
 
-if [[ "$#" == 0 ]]; then
-	echo "No argument has been provided"
-	echo "please see $0 -h for help"
-	exit
-fi
+## creating help functions
 
+function usage() {
 
-if [[ "$1" == "-a" ]]; then
-	echo  "$#"
+echo "usage: ${0} -a <user> -p <password> -s <shell> | ${0} -d <user> | ${0} -h" 
+	}
 
-	if [[ "$#" != "4" ]]; then
-		echo "Usage: $0 -a <login> <passwd> <shell>"
-		exit
-	else
-		echo "These are what you entered"
-		echo "user name: $2"
-		echo "password: $3"
-		echo "shell: $4"
-		read -rp "Press enter (y) to continue or (n) to cancel" choice
-		
-		if [[ "$choice" == "y" ]]; then
-			echo "Adding user"
-			useradd -m "$2" -s "$4"
-			echo "$2":"$3" | chpasswd
-			echo "The user has been added"
-		elif [[ "$choice" == "n" ]]; then
-			echo "Abort"
-			exit
-		else
-			echo "you should have entered a correct choice"
-			exit
+function help() {
+
+echo "$0 - script to add of remove users"
+echo "-a - to add a new user"
+echo "	-p - Set password while creating user if not mentioned will not set any password by default"
+echo "	-s - Set a shell for the user default is /bin/bash if none specified"
+echo "-a - Remove a user"
+echo "-h - Print this help text"
+	}
+
+if [[ "$#" -lt "1" ]]; then
+       echo "Argument has to be provided see $0 -h"
+fi       
+
+shell=/bin/bash
+password=$(openssl rand -base64 32)
+while getopts :a:d:h opt; do 
+	case $opt in 
+	
+		a) user=$OPTARG
+			while getopts :p:s: test
+			do
+				case $test in 
+					p) password=$OPTARG;;
+					s) shell=$OPTARG;;
+					/?) echo "The provided flag is not identified see $0 -h"
+						exit;;
+					:) echo "$OPTARG requires arguments see $0 -h"
+				    	exit;;
+				esac
+			done
+		if [[ "$1" != "-a" ]]
+		then
+			echo "You have to specify username using -a flag see $0 -h"
 		fi
+		useradd -m $user -s $shell
+		echo "$user":"$password" | chpasswd;;
+				
+		d) userdel -f $OPTARG
+			if [[ $? == 0 ]]
+			then
+				echo "user has been removed"
+			else
+				echo "There was some error removing the user"
+			fi;;
 
-		
-	fi
-
-
-elif [[ "$1" == "-d" ]]; then
-	echo "Just a test"
-
-	if [[ "$#" == "2" ]]; then	
-	    awk -F ":" '{print $1}' /etc/passwd | grep "$2"
-	 
-			if [[ "$?" != "0" ]]; then
-				echo "No such user"
-				exit
-			else 
-				echo "deleting user"
-				userdel -f "$2"
-				echo "user deleted"
-			fi
-		
-	else 
-		echo "usage ${0} -d user"
-	fi
-	
-elif [[ "$2" == "-h" ]] || [[ $# == 1 ]]; then
-	printf "The help text"
-	printf "-a - add a new user"
-	printf "syntax\n\
-	$0 -a <user> <password> <shell>"
-	printf "-d - remove a user"
-	printf "syntax\n\
-	$0 -d <user>"
-	echo "-h - print the help text"
-else
-	echo "Please enter a valid input see ${0} -h"
-fi
+		h) help
+			exit;;
+		/?) echo "$OPTARG option not valid";;
+		:) echo "$OPTARG requires argument";;
+	esac
+done
 
 
 
-	
