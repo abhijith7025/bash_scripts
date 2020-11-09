@@ -18,8 +18,8 @@ echo "usage: ${0} -a <user> -p <password> -s <shell> | ${0} -d <user> | ${0} -h"
 
 function help() {
 
-echo "$0 - script to add of remove users"
-echo "-a - to add a new user"
+echo "$0 - Script to add of remove users"
+echo "-a - Add a new user"
 echo "	-p - Set password while creating user if not mentioned will not set any password by default"
 echo "	-s - Set a shell for the user default is /bin/bash if none specified"
 echo "-a - Remove a user"
@@ -52,7 +52,8 @@ while getopts :a:d:h opt; do
 			echo "You have to specify username using -a flag see $0 -h"
 		fi
 		useradd -m $user -s $shell
-		echo "$user":"$password" | chpasswd;;
+		echo "$user":"$password" | chpasswd
+		echo "The password for the $user is $password";;
 				
 		d) userdel -f $OPTARG
 			if [[ $? == 0 ]]
