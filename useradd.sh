@@ -1,4 +1,5 @@
 #!/bin/bash
+t
 
 ## checking if the user is privileged or not
 
