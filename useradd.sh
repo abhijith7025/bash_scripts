@@ -18,12 +18,12 @@ echo "usage: ${0} -a <user> -p <password> -s <shell> | ${0} -d <user> | ${0} -h"
 
 function help() {
 
-echo "$0 - Script to add of remove users"
-echo "-a - Add a new user"
-echo "	-p - Set password while creating user if not mentioned will not set any password by default"
-echo "	-s - Set a shell for the user default is /bin/bash if none specified"
-echo "-a - Remove a user"
-echo "-h - Print this help text"
+echo -e "$0 - Script to add of remove users\n\t\
+-a - Add a new user\n\t\
+-p - Set password while creating user if not mentioned will not set any password by default\n\t\
+-s - Set a shell for the user default is /bin/bash if none specified\n\
+-a - Remove a user\n\
+-h - Print this help text\n"
 	}
 
 if [[ "$#" -lt "1" ]]; then
@@ -31,7 +31,7 @@ if [[ "$#" -lt "1" ]]; then
 fi       
 
 shell=/bin/bash
-password=$(openssl rand -base64 32)
+password=$(openssl rand -base64 12)
 while getopts :a:d:h opt; do 
 	case $opt in 
 	
